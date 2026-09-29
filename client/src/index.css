@@ -108,3 +108,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Keyboard focus must not end up hidden behind the fixed bars (WCAG 2.4.11). */
 html { scroll-padding-top: 64px; scroll-padding-bottom: 88px; }
 @media (min-width: 768px) { html { scroll-padding-top: 8px; scroll-padding-bottom: 8px; } }
+
+/* Mobile account menu (avatar in the top bar) */
+.mobile-menu { position: relative; }
+.menu-trigger { display: grid; place-items: center; width: 44px; height: 44px; margin-right: -6px; border-radius: 50%; }
+.menu-trigger:hover { background: var(--line); }
+.sheet {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 230px; padding: var(--s1);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-pop);
+}
+.sheet-head { display: flex; flex-direction: column; padding: var(--s3) var(--s3) var(--s2); border-bottom: 1px solid var(--line); margin-bottom: var(--s1); }
+.sheet a, .sheet button { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 48px; padding: 0 var(--s3); border-radius: 10px; text-align: left; }
+.sheet a:hover, .sheet button:hover { background: var(--line); }
