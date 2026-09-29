@@ -1,179 +1,153 @@
 # Circl
 
-Circl is a content-first social media platform where people share short posts and photos, follow each other, and keep up with what their circle is doing. It is a full-stack MERN application, fully responsive from phones to wide desktops, with a light and dark theme.
+> A full-stack social media platform built with the MERN stack.
 
-Built as **Task 2** of the CodeAlpha Full Stack Development internship.
+> [!NOTE]
+> CodeAlpha Internship - Task 2 (Full Stack Social Media Platform)
 
-Build progress and phase notes are in [PROGRESS.md](PROGRESS.md).
+Circl is a content-first social web application where people share short posts and photos, follow each other, and keep up with what their circle is doing. It features a two-tab home feed (Everyone and Following), profiles, comments, likes, saved posts, resharing, trending hashtags, suggested people, live notifications, and a complete admin dashboard with reports and analytics. It supports dark and light mode and is fully responsive.
+
+---
+
+![Status](https://img.shields.io/badge/status-complete-brightgreen)
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb)
+![Express](https://img.shields.io/badge/Express-5-black?logo=express)
+
+---
+
+## Live Demo
+
+> [Circl Social Platform](https://codealpha-circl.vercel.app/).
+
+---
 
 ## Features
 
-**Accounts**
-- Register and log in with email and password (JWT sessions, bcrypt hashing)
-- Change password (signs out other devices) and delete your account
-- Light, dark or system theme
+- JWT authentication with role-based access (user / admin), bcrypt password hashing, and sessions that end when the password changes
+- Profiles with avatar, display name, bio, follower and following lists, and that person's posts
+- Text posts (up to 500 characters) with an optional photo, uploaded straight to Cloudinary with signed requests
+- Comments, likes, and saved posts
+- Reshare a post or quote it with your own words, and share by device share sheet or copied link
+- Home feed with Everyone and Following tabs, cursor-based pagination
+- `#hashtags` that link to tag pages, plus trending hashtags from the last 48 hours
+- Suggested people based on who your friends already follow
+- Notifications for likes, comments, follows, reshares and quotes, with an unread badge that updates on its own
+- Report any post or profile from the flag button
+- Admin dashboard with its own sidebar and phone tab bar: key numbers with period-over-period change, an interactive activity chart (7 / 30 / 90 days), content mix, top posts and creators, popular hashtags, newest people, a reports queue (dismiss, remove post, suspend person), people and content management, an audit trail, and CSV exports
+- Dark mode / light mode / system theme with no flash on load
+- Fully responsive layout: bottom tab bar on phones, icon rail on tablets, labelled sidebar on laptops, suggestions column on wide screens
+- Toast messages and in-app confirmation dialogs instead of browser popups
+- Keyboard accessible, screen-reader friendly, WCAG 2 AA contrast
 
-**Profiles**
-- Avatar, display name and bio
-- Follower and following counts with browsable lists
-- Each profile shows that person's posts
+---
 
-**Posts**
-- Text posts (up to 500 characters) with an optional photo
-- Comments, likes and saved posts
-- Reshare a post, or quote it with your own words
-- Share a post with the device share sheet or by copying its link
-- `#hashtags` become links to a tag page
+## Screenshots
 
-**Discovery**
-- Home feed with two tabs: Everyone and Following
-- Suggested people, based on who your friends already follow
-- Trending hashtags from the last 48 hours
-- Explore page with people search
+| Home Feed | Profile | Admin Dashboard |
+|---|---|---|
+| ![Home](screenshots/home.png) | ![Profile](screenshots/profile.png) | ![Admin](screenshots/admin.png) |
 
-**Notifications**
-- Alerts for likes, comments, follows, reshares and quotes
-- Unread badge that updates on its own while the app is open
+| Admin Reports | Mobile | Dark Mode |
+|---|---|---|
+| ![Reports](screenshots/admin_reports.png) | ![Mobile](screenshots/mobile.png) | ![Dark Mode](screenshots/dark_mode.png) |
 
-**Admin dashboard** (admin accounts only, with its own sidebar and phone tab bar)
-- Lands here straight after an admin logs in
-- Analytics: key numbers with period-over-period change, an interactive activity chart (7, 30 or 90 days), content mix, top posts, top creators, popular hashtags and newest people
-- Reports queue: people can flag posts and profiles; admins dismiss, remove the post or suspend the person
-- People and content management with search and filters, an audit trail of admin actions, and CSV exports (people, posts, reports, daily activity)
+---
 
-**Interface**
-- Bottom tab bar and account menu on phones, icon rail on tablets, labelled sidebar from 1024px and a suggestions column from 1280px
-- Report a post or profile from the flag button
-- Toast messages for feedback and in-app confirmation dialogs (no browser popups)
-- Keyboard accessible, screen-reader friendly, meets WCAG 2 AA contrast
+## Tech Stack
 
-## Tech stack
+**Frontend**
+- React 19 + React Router v7
+- Vite (build tooling)
+- Redux Toolkit (auth, feed and notification state)
+- Vanilla CSS with custom property design tokens (light and dark themes)
+- Hand-built SVG charts for the admin dashboard
+- Phosphor icons
+- Axios with JWT interceptor
 
-| Layer | Technology |
-|---|---|
-| Frontend | React, Vite, Redux Toolkit, React Router, axios |
-| Backend | Node.js, Express, Mongoose |
-| Database | MongoDB Atlas |
-| Auth | JSON Web Tokens, bcrypt (`bcryptjs`) |
-| Images | Cloudinary (signed direct uploads) |
-| Hosting | Vercel (client and API as two projects) |
+**Backend**
+- Node.js + Express 5
+- MongoDB Atlas + Mongoose ODM
+- JWT authentication (jsonwebtoken + bcryptjs)
+- Cloudinary (signed direct image uploads)
+- Helmet and express-rate-limit for security
 
-## Project structure
+**Hosting**
+- Vercel (client and API as two projects)
+
+---
+
+## Project Structure
 
 ```
-client/   React app
-          src/app         Redux store
-          src/features    auth, feed and notification state
-          src/components  shared UI (posts, composer, toasts, layout)
-          src/pages       one file per screen
-          src/admin       admin dashboard: layout, charts and pages
-          src/lib         API client, helpers
-server/   Express API
-          src/models      User, Post, Comment, Notification, Report, AdminLog
-          src/controllers request handlers
-          src/routes      route definitions
-          src/middleware  auth, rate limits
-          api/index.js    Vercel serverless entry
-          scripts/        seed data and admin tools
+Circl/
+├── client/                  # React frontend (Vite)
+│   ├── src/
+│   │   ├── app/             # Redux store
+│   │   ├── features/        # auth, feed, notification state
+│   │   ├── components/      # Posts, composer, toasts, layout
+│   │   ├── pages/           # One file per screen
+│   │   ├── admin/           # Admin layout, charts and pages
+│   │   ├── lib/             # API client, helpers
+│   │   └── index.css        # Design system
+│   └── index.html
+└── server/                  # Express API
+    ├── api/                 # Vercel serverless entry
+    ├── scripts/             # Seed data and admin tools
+    └── src/
+        ├── models/          # User, Post, Comment, Notification, Report, AdminLog
+        ├── controllers/     # Request handlers
+        ├── middleware/      # Auth, rate limits
+        └── routes/          # Express routers
 ```
 
-## Installation
+---
 
-### Prerequisites
-- Node.js 20 or newer
-- A MongoDB Atlas cluster (free tier works). Allow your IP under Network Access.
-- A Cloudinary account (free tier works) for image uploads
+## Running Locally
 
-### 1. Get the code
-```bash
-git clone <your-repo-url>
-cd CodeAlpha_Circl
-```
+**Prerequisites:** Node.js 20+, a MongoDB Atlas URI, and a Cloudinary account (free tiers work).
 
-### 2. Set up the server
+**Backend**
+
 ```bash
 cd server
+cp .env.example .env        # fill in MONGODB_URI, JWT_SECRET, CLIENT_URL, CLOUDINARY_*
 npm install
-cp .env.example .env
-```
-Fill in `server/.env`:
-
-| Variable | What it is |
-|---|---|
-| `MONGODB_URI` | Your Atlas connection string |
-| `JWT_SECRET` | A random string of 32 or more characters |
-| `CLIENT_URL` | Where the client runs, `http://localhost:5173` locally |
-| `CLOUDINARY_CLOUD_NAME` | From your Cloudinary dashboard |
-| `CLOUDINARY_API_KEY` | From your Cloudinary dashboard |
-| `CLOUDINARY_API_SECRET` | From your Cloudinary dashboard |
-
-Start it:
-```bash
-npm run dev        # http://localhost:5000
+npm run dev                 # runs on http://localhost:5000
 ```
 
-### 3. Set up the client
-In a second terminal:
+`JWT_SECRET` must be a random string of 32 or more characters.
+
+**Frontend**
+
 ```bash
 cd client
 npm install
-npm run dev        # http://localhost:5173
+npm run dev                 # runs on http://localhost:5173
 ```
-The dev server forwards `/api` requests to the API on port 5000, so keep both terminals running. If the API is stopped, logging in fails with a 502 error.
 
-### 4. Add demo data (optional)
+The dev server forwards `/api` requests to port 5000, so keep both terminals running.
+
+**Demo data (optional)**
+
 ```bash
 cd server
-npm run seed
+npm run seed                # sample people, posts, comments and reports
 ```
-This fills the app with sample people, posts, comments, follows and hashtags so it does not open empty. The demo login details are printed in the terminal when it finishes. Running it again replaces the previous demo data and leaves real accounts alone. Do not run it against a production database.
 
-### 5. Create an admin (optional)
-Register a normal account in the app, then promote it:
+The demo login details are printed in the terminal. Do not run this against a production database.
+
+**Create an admin (optional)**
+
+Register a normal account, then promote it:
+
 ```bash
 cd server
 npm run make-admin -- you@example.com
 ```
-An "Admin" entry then appears in the sidebar (desktop) or the account menu (phone).
 
-## Scripts
+---
 
-| Where | Command | What it does |
-|---|---|---|
-| client | `npm run dev` | Start the dev server |
-| client | `npm run build` | Production build into `dist` |
-| client | `npm run lint` | Lint the code |
-| server | `npm run dev` | Start the API with auto-restart |
-| server | `npm start` | Start the API |
-| server | `npm run seed` | Load demo data |
-| server | `npm run make-admin -- <email>` | Grant the admin role |
-
-## Deployment (Vercel)
-
-Deploy the API and the client as two Vercel projects from the same repository.
-
-1. **Database.** In Atlas, allow `0.0.0.0/0` under Network Access (Vercel addresses change) and use a strong database password.
-2. **API project.** Root Directory `server`, Framework Preset Other. Add the six server environment variables from above. Deploy and check that `https://<api-project>.vercel.app/api/health` answers `{"ok":true}`.
-3. **Client project.** Root Directory `client`, Framework Preset Vite. Add `VITE_API_URL=https://<api-project>.vercel.app/api`. Deploy.
-4. **Connect them.** Set `CLIENT_URL` on the API project to the client's address (several addresses can be separated with commas) and redeploy the API.
-5. If you use a custom API domain, add it to `connect-src` in `client/vercel.json`.
-
-Vercel functions do not keep memory between requests and cannot hold open connections, so notifications use polling, and the rate limiter works per running instance.
-
-## Security overview
-- Passwords are hashed with bcrypt; login errors never reveal whether an email exists
-- Sessions expire after 24 hours, and changing a password ends all older sessions
-- Strict Content-Security-Policy and security headers on the client
-- All input is validated on the server, and user text is only ever rendered as plain text
-- Rate limits on login, writes and polling
-- Image uploads are signed by the server and restricted to your own Cloudinary account
-- Admin access is granted only by a server-side script and checked on every request
-
-## Quality checks
-There is no unit-test suite in this submission. The app was verified by running it:
-- Every API route exercised, including permission and validation failures
-- A 20-step end-to-end run in a real mobile browser (sign up, post, photo upload, like, save, reshare, comment, follow, search, theme, password change, account deletion)
-- An automated audit of 14 screens at 375, 768, 1280 and 1440 pixels in light and dark: no horizontal scrolling, no console errors, and zero accessibility violations
-
-## Author
-Built by Saad as part of the CodeAlpha Full Stack Development internship.
+Part of a 3-project internship submission for CodeAlpha.
+1. [Nexoria](https://github.com/code-with-saad/CodeAlpha_Nexoria) 2. [Circl](https://codealpha-circl.vercel.app/)
