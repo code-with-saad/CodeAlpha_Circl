@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
+import { ConfirmHost, Toaster } from './components/Feedback'
 import RequireAuth from './components/layout/RequireAuth'
 import AuthPage from './pages/AuthPage'
 import ProfilePage, { MeRedirect } from './pages/ProfilePage'
@@ -26,6 +27,7 @@ function Stub({ title }) {
 
 export default function App() {
   return (
+    <>
     <Routes>
       <Route path="login" element={<AuthPage mode="login" />} />
       <Route path="register" element={<AuthPage mode="register" />} />
@@ -49,5 +51,8 @@ export default function App() {
         </Route>
       </Route>
     </Routes>
+    <Toaster />
+    <ConfirmHost />
+    </>
   )
 }

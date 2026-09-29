@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Check } from '@phosphor-icons/react'
-import { api } from '../lib/api'
+import { api, errorMessage } from '../lib/api'
+import { toast } from '../lib/feedback'
 import { followingChanged } from '../features/auth/authSlice'
 
 // Optimistic follow toggle. `onChange(isFollowing, followersCount?)` lets the parent update its own numbers.
@@ -18,8 +19,9 @@ export default function FollowButton({ username, isFollowing, onChange }) {
       const { data } = await api({ method: next ? 'post' : 'delete', url: `/users/${username}/follow` })
       onChange(data.isFollowing, data.followersCount)
       dispatch(followingChanged(next ? 1 : -1))
-    } catch {
+    } catch (e) {
       onChange(!next)
+      toast.error(errorMessage(e))
     } finally {
       setBusy(false)
     }

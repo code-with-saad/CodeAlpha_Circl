@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { api, errorMessage, fieldErrors } from '../lib/api'
 import { getTheme, setTheme } from '../lib/theme'
+import { toast } from '../lib/feedback'
 import { logout, tokenRefreshed } from '../features/auth/authSlice'
 import './notifications.css'
 import './auth.css'
@@ -57,23 +58,24 @@ function PasswordForm({ onChanged }) {
   const username = useSelector((st) => st.auth.user.username)
   const [form, setForm] = useState({ current: '', next: '', confirm: '' })
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
   const [fields, setFields] = useState({})
-  const [done, setDone] = useState(false)
-  const set = (k) => (e) => { setDone(false); setForm((f) => ({ ...f, [k]: e.target.value })) }
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
   async function submit(e) {
     e.preventDefault()
-    setError(''); setFields({}); setDone(false)
+    setFields({})
     if (form.next !== form.confirm) return setFields({ confirm: 'Passwords do not match' })
     setBusy(true)
     try {
       const { data } = await api.patch('/users/me/password', { current: form.current, next: form.next })
       onChanged(data.token)
       setForm({ current: '', next: '', confirm: '' })
-      setDone(true)
+      toast.success('Password updated. Other devices were signed out.')
     } catch (err) {
-      setError(errorMessage(err)); setFields(fieldErrors(err))
+      const f = fieldErrors(err)
+      setFields(f)
+      // Field problems are shown next to the field; anything else is a toast.
+      if (!Object.keys(f).length) toast.error(errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -85,7 +87,6 @@ function PasswordForm({ onChanged }) {
       <form className="set-form" onSubmit={submit} noValidate>
         {/* Lets password managers file the new password under the right account */}
         <input className="sr-only" type="text" name="username" autoComplete="username" value={username} readOnly tabIndex={-1} aria-hidden="true" />
-        {error && !Object.keys(fields).length && <p className="form-error" role="alert">{error}</p>}
         <label className="field"><span className="field-label">Current password</span>
           <input type="password" autoComplete="current-password" value={form.current} onChange={set('current')} required />
           {fields.current && <span className="field-error" role="alert">{fields.current}</span>}
@@ -99,7 +100,6 @@ function PasswordForm({ onChanged }) {
           {fields.confirm && <span className="field-error" role="alert">{fields.confirm}</span>}
         </label>
         <button className="btn-primary" disabled={busy || !form.current || !form.next}>{busy ? 'Saving...' : 'Update password'}</button>
-        {done && <p className="set-ok" role="status">Password updated. Other devices were signed out.</p>}
       </form>
     </section>
   )
@@ -117,6 +117,7 @@ function DeleteAccount({ onDeleted }) {
     setBusy(true); setError('')
     try {
       await api.delete('/users/me', { data: { password } })
+      toast.success('Your account was deleted.')
       onDeleted()
     } catch (err) {
       setError(errorMessage(err)); setBusy(false)

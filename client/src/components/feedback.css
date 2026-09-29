@@ -1,0 +1,31 @@
+/* Toasts sit above the mobile tab bar, and bottom-centre of the feed column on larger screens. */
+.toaster {
+  position: fixed; z-index: 60; left: var(--s4); right: var(--s4);
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--s3));
+  display: flex; flex-direction: column; align-items: center; gap: var(--s2); pointer-events: none;
+}
+.toast {
+  pointer-events: auto; display: flex; align-items: center; gap: var(--s3); width: 100%; max-width: 440px;
+  padding: var(--s3) var(--s2) var(--s3) var(--s4); border-radius: 14px; box-shadow: var(--shadow-pop);
+  background: var(--ink); color: var(--bg); animation: toast-in 0.18s ease-out;
+}
+.toast-icon { flex: none; }
+.toast-success .toast-icon { color: #7FB39F; }
+.toast-error .toast-icon { color: #F07B55; }
+.toast-text { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
+.toast-close { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: inherit; opacity: 0.75; }
+.toast-close:hover { opacity: 1; background: color-mix(in srgb, var(--bg) 15%, transparent); }
+.toast :focus-visible { outline-color: var(--bg); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+@media (min-width: 768px) { .toaster { bottom: var(--s5); } }
+
+dialog.confirm {
+  width: min(92vw, 400px); padding: var(--s5); border: 1px solid var(--line); border-radius: 18px;
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow-pop);
+}
+dialog.confirm::backdrop { background: rgba(26, 23, 20, 0.55); }
+.confirm-title { margin: 0 0 var(--s2); font: 600 22px/1.2 var(--font-display); }
+.confirm-message { margin: 0 0 var(--s5); color: var(--muted); overflow-wrap: anywhere; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: var(--s3); }
+.confirm-actions .btn-outline, .confirm-actions .btn-danger-solid, .confirm-actions .confirm-go { height: 44px; padding: 0 var(--s5); margin: 0; }

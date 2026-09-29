@@ -4,6 +4,7 @@ import { Image as ImageIcon, X } from '@phosphor-icons/react'
 import Avatar from './Avatar'
 import { api, errorMessage } from '../lib/api'
 import { fit, uploadImage, validateImage } from '../lib/cloudinary'
+import { toast } from '../lib/feedback'
 import { postCreated } from '../features/feed/feedSlice'
 import './post.css'
 
@@ -17,7 +18,6 @@ export default function Composer({ onDone, className = '', autoFocus = false }) 
   const [image, setImage] = useState('')
   const [uploading, setUploading] = useState(false)
   const [posting, setPosting] = useState(false)
-  const [error, setError] = useState('')
 
   const left = MAX - text.length
   const canPost = (text.trim() || image) && left >= 0 && !uploading && !posting
@@ -27,13 +27,12 @@ export default function Composer({ onDone, className = '', autoFocus = false }) 
     e.target.value = ''
     if (!file) return
     const problem = validateImage(file)
-    if (problem) return setError(problem)
-    setError('')
+    if (problem) return toast.error(problem)
     setUploading(true)
     try {
       setImage(await uploadImage(file, 'post'))
     } catch (err) {
-      setError(err.message)
+      toast.error(err.message)
     } finally {
       setUploading(false)
     }
@@ -43,15 +42,15 @@ export default function Composer({ onDone, className = '', autoFocus = false }) 
     e.preventDefault()
     if (!canPost) return
     setPosting(true)
-    setError('')
     try {
       const { data } = await api.post('/posts', { text, image })
       dispatch(postCreated(data.post))
       setText('')
       setImage('')
+      toast.success('Posted')
       onDone?.(data.post)
     } catch (err) {
-      setError(errorMessage(err))
+      toast.error(errorMessage(err))
     } finally {
       setPosting(false)
     }
@@ -69,7 +68,6 @@ export default function Composer({ onDone, className = '', autoFocus = false }) 
             <button type="button" className="composer-remove" onClick={() => setImage('')} aria-label="Remove photo"><X size={18} weight="bold" /></button>
           </div>
         )}
-        {error && <p className="field-error" role="alert">{error}</p>}
         <div className="composer-bar">
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={pick} hidden />
           <button type="button" className="icon-btn" onClick={() => fileRef.current.click()} disabled={uploading || !!image} aria-label="Add photo">

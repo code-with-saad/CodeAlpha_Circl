@@ -6,6 +6,7 @@ import Avatar from './Avatar'
 import PostText from './PostText'
 import { api, errorMessage } from '../lib/api'
 import { fit } from '../lib/cloudinary'
+import { confirm, toast } from '../lib/feedback'
 import { timeAgo } from '../lib/time'
 import { feedStale, postPatched, postRemoved } from '../features/feed/feedSlice'
 import './post.css'
@@ -13,8 +14,6 @@ import './post.css'
 export default function PostCard({ post, detail = false, onRemoved }) {
   const dispatch = useDispatch()
   const meId = useSelector((s) => s.auth.user?.id)
-  const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
   const [menu, setMenu] = useState(false)
   const [quoting, setQuoting] = useState(false)
   const [quote, setQuote] = useState('')
@@ -34,11 +33,6 @@ export default function PostCard({ post, detail = false, onRemoved }) {
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', close) }
   }, [menu])
 
-  function flash(msg) {
-    setNotice(msg)
-    setTimeout(() => setNotice(''), 2200)
-  }
-
   async function toggle(kind) {
     const before = live
     const on = kind === 'like' ? !live.liked : !live.saved
@@ -46,20 +40,18 @@ export default function PostCard({ post, detail = false, onRemoved }) {
       ? { ...live, liked: on, likesCount: live.likesCount + (on ? 1 : -1) }
       : { ...live, saved: on }
     setLive(next)
-    setError('')
     try {
       await api({ method: on ? 'post' : 'delete', url: `/posts/${post.id}/${kind === 'like' ? 'like' : 'save'}` })
       dispatch(postPatched({ id: post.id, ...next }))
     } catch (e) {
       setLive(before)
-      setError(errorMessage(e))
+      toast.error(errorMessage(e))
     }
   }
 
   async function reshare(withText) {
     const undo = live.reshared && !withText
     setMenu(false)
-    setError('')
     try {
       const { data } = await api({
         method: undo ? 'delete' : 'post',
@@ -70,9 +62,9 @@ export default function PostCard({ post, detail = false, onRemoved }) {
       setQuoting(false)
       setQuote('')
       dispatch(feedStale())
-      flash(undo ? 'Reshare removed' : withText ? 'Quote posted' : 'Reshared')
+      toast.success(undo ? 'Reshare removed' : withText ? 'Quote posted' : 'Reshared')
     } catch (e) {
-      setError(errorMessage(e))
+      toast.error(errorMessage(e))
     }
   }
 
@@ -81,20 +73,22 @@ export default function PostCard({ post, detail = false, onRemoved }) {
     const url = `${window.location.origin}/post/${target}`
     try {
       if (navigator.share) await navigator.share({ url, text: (repostOf?.text || post.text).slice(0, 100) })
-      else { await navigator.clipboard.writeText(url); flash('Link copied') }
+      else { await navigator.clipboard.writeText(url); toast.success('Link copied') }
     } catch (e) {
-      if (e.name !== 'AbortError') flash('Could not share')
+      if (e.name !== 'AbortError') toast.error('Could not share this post')
     }
   }
 
   async function remove() {
-    if (!window.confirm('Delete this post? This cannot be undone.')) return
+    const ok = await confirm({ title: 'Delete this post?', message: 'This also removes its comments and reshares. It cannot be undone.', confirmLabel: 'Delete', danger: true })
+    if (!ok) return
     try {
       await api.delete(`/posts/${post.id}`)
       dispatch(postRemoved(post.id))
       onRemoved?.(post.id)
+      toast.success('Post deleted')
     } catch (e) {
-      setError(errorMessage(e))
+      toast.error(errorMessage(e))
     }
   }
 
@@ -175,9 +169,6 @@ export default function PostCard({ post, detail = false, onRemoved }) {
             </div>
           </form>
         )}
-        <p className="sr-only" role="status">{notice}</p>
-        {notice && <p className="post-notice" aria-hidden="true">{notice}</p>}
-        {error && <p className="field-error" role="alert">{error}</p>}
       </div>
     </article>
   )

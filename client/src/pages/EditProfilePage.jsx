@@ -5,6 +5,7 @@ import { ArrowLeft, Camera } from '@phosphor-icons/react'
 import Avatar from '../components/Avatar'
 import { api, errorMessage, fieldErrors } from '../lib/api'
 import { uploadImage, validateImage } from '../lib/cloudinary'
+import { toast } from '../lib/feedback'
 import { userUpdated } from '../features/auth/authSlice'
 import './profile.css'
 import './auth.css'
@@ -17,7 +18,6 @@ export default function EditProfilePage() {
   const [form, setForm] = useState({ displayName: me.displayName, bio: me.bio })
   const [avatar, setAvatar] = useState(me.avatar)
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
   const [fields, setFields] = useState({})
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -27,13 +27,12 @@ export default function EditProfilePage() {
     e.target.value = ''
     if (!file) return
     const problem = validateImage(file)
-    if (problem) return setError(problem)
-    setError('')
+    if (problem) return toast.error(problem)
     setBusy(true)
     try {
       setAvatar(await uploadImage(file, 'avatar'))
     } catch (err) {
-      setError(err.message || errorMessage(err))
+      toast.error(err.message || errorMessage(err))
     } finally {
       setBusy(false)
     }
@@ -43,14 +42,14 @@ export default function EditProfilePage() {
     e.preventDefault()
     if (busy) return
     setBusy(true)
-    setError('')
     setFields({})
     try {
       const { data } = await api.patch('/users/me', { ...form, avatar })
       dispatch(userUpdated(data.user))
+      toast.success('Profile updated')
       navigate(`/u/${data.user.username}`)
     } catch (err) {
-      setError(errorMessage(err))
+      toast.error(errorMessage(err))
       setFields(fieldErrors(err))
       setBusy(false)
     }
@@ -72,8 +71,6 @@ export default function EditProfilePage() {
           </button>
           {avatar && <button type="button" className="link-btn" onClick={() => setAvatar('')}>Remove</button>}
         </div>
-
-        {error && <p className="form-error" role="alert">{error}</p>}
 
         <label className="field">
           <span className="field-label">Name</span>

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import Avatar from '../components/Avatar'
 import { api, errorMessage } from '../lib/api'
 import { timeAgo } from '../lib/time'
+import { confirm, toast } from '../lib/feedback'
 import './admin.css'
 
 // The server checks the admin role on every request; this guard only keeps the UI tidy.
@@ -88,7 +89,6 @@ function usePaged(path, params) {
 function Users() {
   const [q, setQ] = useState('')
   const [term, setTerm] = useState('')
-  const [error, setError] = useState('')
   const list = usePaged('/admin/users', { q: term })
 
   useEffect(() => {
@@ -97,20 +97,25 @@ function Users() {
   }, [q])
 
   async function ban(u) {
-    setError('')
+    if (!u.banned) {
+      const ok = await confirm({ title: `Suspend @${u.username}?`, message: 'They will be signed out and cannot log in until you restore them.', confirmLabel: 'Suspend', danger: true })
+      if (!ok) return
+    }
     try {
       const { data } = await api.patch(`/admin/users/${u.id}`, { banned: !u.banned })
       list.patch((items) => items.map((x) => (x.id === u.id ? data.user : x)))
-    } catch (e) { setError(errorMessage(e)) }
+      toast.success(u.banned ? `@${u.username} restored` : `@${u.username} suspended`)
+    } catch (e) { toast.error(errorMessage(e)) }
   }
 
   async function remove(u) {
-    if (!window.confirm(`Permanently delete @${u.username} and everything they posted? This cannot be undone.`)) return
-    setError('')
+    const ok = await confirm({ title: `Delete @${u.username}?`, message: 'Their profile, posts, comments and reshares are removed for good. This cannot be undone.', confirmLabel: 'Delete person', danger: true })
+    if (!ok) return
     try {
       await api.delete(`/admin/users/${u.id}`)
       list.patch((items) => items.filter((x) => x.id !== u.id))
-    } catch (e) { setError(errorMessage(e)) }
+      toast.success(`@${u.username} deleted`)
+    } catch (e) { toast.error(errorMessage(e)) }
   }
 
   return (
@@ -119,7 +124,7 @@ function Users() {
         <label className="sr-only" htmlFor="admin-q">Search people</label>
         <input id="admin-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, username or email" />
       </div>
-      {(error || list.error) && <p className="field-error admin-pad" role="alert">{error || list.error}</p>}
+      {list.error && <p className="field-error admin-pad" role="alert">{list.error}</p>}
       {list.items.map((u) => (
         <div key={u.id} className={`admin-row${u.banned ? ' is-banned' : ''}`}>
           <Avatar user={u} size={40} />
@@ -149,20 +154,20 @@ function Users() {
 
 function Posts() {
   const list = usePaged('/admin/posts', {})
-  const [error, setError] = useState('')
 
   async function remove(p) {
-    if (!window.confirm('Delete this post along with its comments and reshares?')) return
-    setError('')
+    const ok = await confirm({ title: 'Delete this post?', message: 'Its comments and reshares are removed too. This cannot be undone.', confirmLabel: 'Delete post', danger: true })
+    if (!ok) return
     try {
       await api.delete(`/admin/posts/${p.id}`)
       list.patch((items) => items.filter((x) => x.id !== p.id))
-    } catch (e) { setError(errorMessage(e)) }
+      toast.success('Post deleted')
+    } catch (e) { toast.error(errorMessage(e)) }
   }
 
   return (
     <>
-      {(error || list.error) && <p className="field-error admin-pad" role="alert">{error || list.error}</p>}
+      {list.error && <p className="field-error admin-pad" role="alert">{list.error}</p>}
       {list.items.map((p) => (
         <div key={p.id} className="admin-row">
           <Avatar user={p.author} size={40} />

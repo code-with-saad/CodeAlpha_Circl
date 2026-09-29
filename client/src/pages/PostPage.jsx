@@ -6,6 +6,7 @@ import Avatar from '../components/Avatar'
 import PostCard from '../components/PostCard'
 import { api, errorMessage } from '../lib/api'
 import { timeAgo } from '../lib/time'
+import { toast } from '../lib/feedback'
 import '../components/post.css'
 import './profile.css'
 
@@ -22,7 +23,6 @@ function Thread({ id }) {
   const [status, setStatus] = useState('loading')
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     let live = true
@@ -36,14 +36,13 @@ function Thread({ id }) {
     e.preventDefault()
     if (!text.trim() || sending) return
     setSending(true)
-    setError('')
     try {
       const { data } = await api.post(`/posts/${id}/comments`, { text })
       setComments((c) => [...c, data.comment])
       setPost((p) => ({ ...p, commentsCount: p.commentsCount + 1 }))
       setText('')
     } catch (err) {
-      setError(errorMessage(err))
+      toast.error(errorMessage(err))
     } finally {
       setSending(false)
     }
@@ -54,8 +53,9 @@ function Thread({ id }) {
       await api.delete(`/comments/${c.id}`)
       setComments((list) => list.filter((x) => x.id !== c.id))
       setPost((p) => ({ ...p, commentsCount: Math.max(0, p.commentsCount - 1) }))
+      toast.success('Comment deleted')
     } catch (err) {
-      setError(errorMessage(err))
+      toast.error(errorMessage(err))
     }
   }
 
@@ -80,7 +80,6 @@ function Thread({ id }) {
             <textarea id="comment-text" rows={1} value={text} maxLength={300} onChange={(e) => setText(e.target.value)} placeholder="Add a comment" />
             <button className="composer-post" disabled={!text.trim() || sending}>Reply</button>
           </form>
-          {error && <p className="field-error" role="alert" style={{ padding: '0 var(--s4)' }}>{error}</p>}
 
           <section className="comments" aria-label="Comments">
             {comments.map((c) => (
