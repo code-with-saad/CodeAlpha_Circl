@@ -41,7 +41,12 @@ export default function AuthPage({ mode }) {
 
   useEffect(() => { dispatch(clearError()) }, [mode, dispatch])
 
-  if (token && user) return <Navigate to={location.state?.from || '/'} replace />
+  // Admins land on their dashboard (or the admin page they were sent from); everyone else goes back where they were.
+  if (token && user) {
+    const from = location.state?.from
+    const dest = user.role === 'admin' ? (from?.startsWith('/admin') ? from : '/admin') : from || '/'
+    return <Navigate to={dest} replace />
+  }
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
   const submit = (e) => {

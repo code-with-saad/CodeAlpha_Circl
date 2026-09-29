@@ -86,7 +86,7 @@ export default function AppShell() {
   const { username, role } = useSelector((s) => s.auth.user)
   const unread = useSelector((s) => s.notifications.unread)
   useNotificationPolling()
-  const nav = [...items, ...(role === 'admin' ? [{ to: '/admin', label: 'Admin', Icon: ShieldCheck, desktopOnly: true }] : [])].map((i) => (i.to === '/me' ? { ...i, to: `/u/${username}` } : i))
+  const nav = [...items, ...(role === 'admin' ? [{ to: '/admin', label: 'Admin dashboard', Icon: ShieldCheck, desktopOnly: true }] : [])].map((i) => (i.to === '/me' ? { ...i, to: `/u/${username}` } : i))
   return (
     <div className="shell">
       <nav className="nav" aria-label="Primary">
