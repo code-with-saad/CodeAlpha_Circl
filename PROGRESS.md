@@ -82,3 +82,9 @@ Responsive checks at 375px, 768px and 1280px+ happen inside each phase, not at t
 - End-to-end run in a real mobile browser: 20 of 20 steps pass.
 - Findings that were not app bugs: login limiter (429) tripped by repeated test logins, which confirms it works.
 - Not done here (needs the owner): create the two Vercel projects, set env vars, rotate the shared secrets, push to GitHub.
+
+## Follow-up: toasts, confirm dialog, mobile menu
+- Removed every native browser dialog (`window.confirm`). Destructive actions (delete post, suspend or delete a person in the admin panel) now use an in-app confirmation built on the native `<dialog>` element: focus is trapped, Escape and backdrop click cancel, and focus starts on Cancel so a stray Enter never confirms.
+- Action feedback is now a toast (`toast.success`, `toast.error`, `toast.info` from `client/src/lib/feedback.js`): posted, deleted, saved profile, password updated, reshared, link copied, and every failed action. Errors last 7s, others 4s, and hovering or focusing a toast pauses it. Errors are announced with `role="alert"`, the rest politely with `role="status"`. Validation errors on form fields and "could not load" states stay inline on purpose.
+- Mobile navigation fix: the bottom bar only holds five destinations, so Saved, Settings and Admin were unreachable on phones. The avatar in the top bar now opens a menu with Saved, Settings, Admin (admins only) and Log out. It closes on Escape (focus returns to the button), on outside click, and after choosing an item.
+- Verified in a real 375px browser: 15 of 15 checks pass and zero native dialogs fired.
