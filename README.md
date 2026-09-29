@@ -35,12 +35,15 @@ Build progress and phase notes are in [PROGRESS.md](PROGRESS.md).
 - Alerts for likes, comments, follows, reshares and quotes
 - Unread badge that updates on its own while the app is open
 
-**Admin panel**
-- Overview numbers, people management (suspend, restore, delete) and post moderation
-- Visible only to admin accounts
+**Admin dashboard** (admin accounts only, with its own sidebar and phone tab bar)
+- Lands here straight after an admin logs in
+- Analytics: key numbers with period-over-period change, an interactive activity chart (7, 30 or 90 days), content mix, top posts, top creators, popular hashtags and newest people
+- Reports queue: people can flag posts and profiles; admins dismiss, remove the post or suspend the person
+- People and content management with search and filters, an audit trail of admin actions, and CSV exports (people, posts, reports, daily activity)
 
 **Interface**
-- Bottom tab bar and account menu on phones, icon rail on tablets, labelled sidebar with a suggestions column on desktops
+- Bottom tab bar and account menu on phones, icon rail on tablets, labelled sidebar from 1024px and a suggestions column from 1280px
+- Report a post or profile from the flag button
 - Toast messages for feedback and in-app confirmation dialogs (no browser popups)
 - Keyboard accessible, screen-reader friendly, meets WCAG 2 AA contrast
 
@@ -63,9 +66,10 @@ client/   React app
           src/features    auth, feed and notification state
           src/components  shared UI (posts, composer, toasts, layout)
           src/pages       one file per screen
+          src/admin       admin dashboard: layout, charts and pages
           src/lib         API client, helpers
 server/   Express API
-          src/models      User, Post, Comment, Notification
+          src/models      User, Post, Comment, Notification, Report, AdminLog
           src/controllers request handlers
           src/routes      route definitions
           src/middleware  auth, rate limits
