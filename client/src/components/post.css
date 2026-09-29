@@ -1,0 +1,79 @@
+.post { display: flex; gap: var(--s3); padding: var(--s4); border-bottom: 1px solid var(--line); }
+.post-body { flex: 1; min-width: 0; }
+.post-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s2); }
+.post-name { font-weight: 600; overflow-wrap: anywhere; }
+.post-name:hover { text-decoration: underline; }
+.post-handle, .post-time { color: var(--muted); font-size: 15px; }
+.post-handle { overflow-wrap: anywhere; }
+.post-text { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.post-image { display: block; width: 100%; max-height: 520px; margin-top: var(--s3); object-fit: cover; border-radius: var(--radius); background: var(--line); }
+.post-actions { display: flex; align-items: center; gap: var(--s5); margin: var(--s2) 0 calc(var(--s2) * -1); }
+.post-action { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; min-width: 44px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.post-action:hover { color: var(--ink); }
+.post-delete { margin-left: auto; justify-content: center; }
+.post-delete:hover { color: var(--accent); }
+.post-detail .post-text { font-size: 18px; }
+
+.feed-tabs { position: sticky; top: 52px; z-index: 5; display: flex; background: var(--glass); border-bottom: 1px solid var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.feed-tab { position: relative; flex: 1; height: 48px; font-weight: 500; color: var(--muted); }
+.feed-tab[aria-selected='true'] { color: var(--ink); font-weight: 600; }
+.feed-tab[aria-selected='true']::after { content: ''; position: absolute; left: 30%; right: 30%; bottom: -1px; height: 3px; border-radius: 3px; background: var(--accent); }
+.feed-note { padding: var(--s6) var(--s4); text-align: center; color: var(--muted); }
+.feed-more { display: block; margin: var(--s4) auto; }
+
+.composer { display: flex; gap: var(--s3); padding: var(--s4); border-bottom: 1px solid var(--line); }
+.composer-main { flex: 1; min-width: 0; }
+.composer textarea { width: 100%; min-height: 84px; padding: 6px 0; font: inherit; font-size: 18px; color: var(--ink); background: transparent; border: 0; resize: none; }
+.composer textarea:focus { outline: none; }
+.composer-preview { position: relative; margin-top: var(--s2); }
+.composer-preview img { display: block; width: 100%; max-height: 320px; object-fit: cover; border-radius: var(--radius); }
+.composer-remove { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: rgba(34, 30, 26, 0.75); color: #fff; }
+.composer-bar { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--line); }
+.composer-count { margin-left: auto; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.composer-count.over { color: var(--accent); font-weight: 600; }
+.composer-post { height: 40px; padding: 0 var(--s5); border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.composer-post:disabled { opacity: 0.45; cursor: not-allowed; }
+.composer-inline { display: none; }
+@media (min-width: 768px) { .composer-inline { display: flex; } .feed-tabs { top: 0; } }
+
+.comments { border-top: 0; }
+.comment { display: flex; gap: var(--s3); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+.comment-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-form { display: flex; gap: var(--s3); align-items: flex-end; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+.comment-form textarea { flex: 1; min-height: 44px; max-height: 140px; padding: 10px var(--s3); font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 22px; resize: none; }
+.comment-form textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+
+.post-like.on { color: var(--accent); }
+.post-save.on { color: var(--moss); }
+.post-like:hover { color: var(--accent); }
+.post-save:hover { color: var(--moss); }
+.post-actions .post-delete { margin-left: auto; }
+
+.hashtag { color: var(--accent); font-weight: 500; }
+.hashtag:hover { text-decoration: underline; }
+.post-reshared { display: flex; align-items: center; gap: 6px; margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.post-embed { display: block; margin-top: var(--s3); padding: var(--s3); border: 1px solid var(--line); border-radius: var(--radius); }
+.post-embed:hover { border-color: var(--muted); }
+.post-embed-head { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.post-embed-text { display: block; margin-top: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.post-embed .post-image { margin-top: var(--s2); max-height: 320px; }
+.post-embed-gone { color: var(--muted); }
+.post-reshare.on { color: var(--moss); }
+.post-menu-wrap { position: relative; }
+.menu { position: absolute; z-index: 15; top: 100%; left: 0; min-width: 160px; padding: var(--s1); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-pop); }
+.menu button { display: block; width: 100%; min-height: 44px; padding: 0 var(--s3); text-align: left; border-radius: 8px; }
+.menu button:hover { background: var(--line); }
+.quote-form { margin-top: var(--s2); }
+.quote-form textarea { width: 100%; padding: var(--s3); font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; resize: vertical; }
+.quote-form textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.quote-actions { display: flex; justify-content: flex-end; align-items: center; gap: var(--s4); margin-top: var(--s2); }
+.post-notice { margin: 0; font-size: 14px; color: var(--moss); }
+.post-actions { flex-wrap: wrap; gap: 0 var(--s4); }
+
+/* Six actions must fit in one row at 375px: tighter hit areas on small screens, roomier from 480px. */
+.post-actions { flex-wrap: nowrap; gap: 0; }
+.post-action { min-width: 40px; padding: 0 4px; }
+.post-actions .post-delete { margin-left: auto; }
+@media (min-width: 480px) { .post-actions { gap: 0 var(--s2); } .post-action { min-width: 44px; padding: 0 var(--s2); } }
+
+.comment-avatar { display: block; padding: 2px; }

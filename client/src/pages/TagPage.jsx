@@ -1,0 +1,32 @@
+import { useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft } from '@phosphor-icons/react'
+import PostCard from '../components/PostCard'
+import { usePagedPosts } from '../lib/usePagedPosts'
+import '../components/post.css'
+import '../components/discover.css'
+import './profile.css'
+
+export default function TagPage() {
+  const { tag } = useParams()
+  return <Tag key={tag} tag={tag.toLowerCase()} />
+}
+
+function Tag({ tag }) {
+  const navigate = useNavigate()
+  const posts = usePagedPosts(`/posts?tag=${encodeURIComponent(tag)}`)
+  return (
+    <>
+      <div className="edit-bar">
+        <button className="icon-btn" onClick={() => navigate(-1)} aria-label="Back"><ArrowLeft size={24} /></button>
+        <h1 className="edit-title">#{tag}</h1>
+      </div>
+      {posts.items.map((p) => <PostCard key={p.id} post={p} onRemoved={posts.remove} />)}
+      {posts.error && <p className="profile-empty" role="alert">{posts.error}</p>}
+      {posts.loading && !posts.items.length && <p className="profile-empty" role="status">Loading...</p>}
+      {!posts.loading && !posts.error && !posts.items.length && <p className="profile-empty">No posts with #{tag} yet.</p>}
+      {posts.hasMore && posts.items.length > 0 && (
+        <button className="btn-outline feed-more" onClick={posts.loadMore} disabled={posts.loading}>Show more</button>
+      )}
+    </>
+  )
+}

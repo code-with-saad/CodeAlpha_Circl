@@ -1,0 +1,110 @@
+:root {
+  --bg: #F6F1EA;
+  --surface: #FFFDF9;
+  --ink: #221E1A;
+  --muted: #6F675E;
+  --line: #E4DBCF;
+  --accent: #B53B18;
+  --accent-ink: #FFFFFF;
+  --moss: #2F5D50;
+  --glass: rgba(255, 253, 249, 0.85);
+  --shadow-pop: 0 8px 28px rgba(34, 30, 26, 0.14);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-ui: 'Instrument Sans', system-ui, sans-serif;
+
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  --radius: 14px;
+  --tabbar-h: 60px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) { --bg: #1A1714; --surface: #231F1B; --ink: #F2EBE2; --muted: #A69C90; --line: #332D27; --accent: #F07B55; --accent-ink: #1A1714; --moss: #7FB39F; --glass: rgba(35, 31, 27, 0.85); --shadow-pop: 0 8px 28px rgba(0, 0, 0, 0.5); color-scheme: dark; }
+}
+:root[data-theme='dark'] { --bg: #1A1714; --surface: #231F1B; --ink: #F2EBE2; --muted: #A69C90; --line: #332D27; --accent: #F07B55; --accent-ink: #1A1714; --moss: #7FB39F; --glass: rgba(35, 31, 27, 0.85); --shadow-pop: 0 8px 28px rgba(0, 0, 0, 0.5); color-scheme: dark; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.45 var(--font-ui); }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- App shell ---------- */
+.shell { min-height: 100dvh; }
+.main { min-width: 0; padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+.topbar {
+  position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between;
+  height: 52px; padding: 0 var(--s4); background: var(--glass); border-bottom: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.wordmark { display: inline-flex; align-items: center; gap: var(--s2); font: 600 22px/1 var(--font-display); letter-spacing: -0.01em; }
+.wordmark-ring { width: 20px; height: 20px; border-radius: 50%; border: 4px solid var(--accent); position: relative; }
+.wordmark-ring::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--moss); }
+
+.nav { position: fixed; z-index: 20; display: flex; }
+.nav-link { display: flex; align-items: center; gap: var(--s3); color: var(--muted); border-radius: 999px; }
+.nav-link[aria-current='page'] { color: var(--ink); font-weight: 600; }
+.nav-link[aria-current='page'] .nav-icon { color: var(--accent); }
+.nav-label { display: none; }
+.nav-brand { display: none; }
+
+/* mobile: bottom tab bar */
+.nav { left: 0; right: 0; bottom: 0; height: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+  justify-content: space-around; background: var(--glass); border-top: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.nav-link { justify-content: center; flex: 1; min-height: 48px; }
+.nav-link-desk { display: none; }
+.nav-compose { color: var(--accent); }
+.nav-compose-label { display: none; }
+.rail-right { display: none; }
+
+/* tablet 768+: icon rail */
+@media (min-width: 768px) {
+  .main { padding-bottom: 0; margin-left: 76px; }
+  .topbar { display: none; }
+  .nav { top: 0; bottom: auto; right: auto; width: 76px; height: 100dvh; flex-direction: column; align-items: center; justify-content: flex-start;
+    gap: var(--s1); padding: var(--s4) 0; border-top: 0; border-right: 1px solid var(--line); background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .nav-link { flex: 0 0 auto; width: 48px; height: 48px; }
+  .nav-link:hover { background: var(--line); }
+  .nav-link-desk { display: flex; }
+  .nav-brand { display: flex; margin-bottom: var(--s4); }
+  .wordmark-text { display: none; }
+  .nav-compose { margin-top: var(--s3); background: var(--accent); color: var(--accent-ink); }
+  .nav-compose:hover { background: var(--accent); }
+  .feed-col { max-width: 600px; margin: 0 auto; border-inline: 1px solid var(--line); min-height: 100dvh; }
+}
+
+/* desktop 1280+: labelled nav + right rail */
+@media (min-width: 1280px) {
+  .shell { display: grid; grid-template-columns: 1fr 600px 1fr; }
+  .main { display: contents; }
+  .nav { position: sticky; grid-column: 1; justify-self: end; width: 244px; align-items: stretch; padding: var(--s4); border-right: 0; }
+  .nav-link { width: auto; padding: 0 var(--s4); justify-content: flex-start; }
+  .nav-label { display: inline; font-size: 18px; }
+  .wordmark-text { display: inline; }
+  .nav-compose { justify-content: center; padding: 0 var(--s5); font-weight: 600; }
+  .nav-compose-label { display: inline; }
+  .feed-col { grid-column: 2; margin: 0; }
+  .rail-right { display: block; grid-column: 3; justify-self: start; width: 320px; padding: var(--s4) var(--s5); position: sticky; top: 0; align-self: start; }
+}
+
+.rail-title { font: 600 18px/1.2 var(--font-display); margin: 0 0 var(--s3); }
+.page-title { margin: 0; padding: var(--s5) var(--s4); font: 600 28px/1.1 var(--font-display); letter-spacing: -0.01em; }
+.placeholder { padding: 0 var(--s4); color: var(--muted); }
+
+.nav-icon-wrap { position: relative; display: inline-flex; }
+.nav-badge {
+  position: absolute; top: -6px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; display: grid; place-items: center;
+  border-radius: 9px; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 700; line-height: 1;
+  border: 2px solid var(--bg);
+}
+
+/* Touch targets: the wordmark link is small text, so give it a full-height hit area. */
+.wordmark { min-height: 44px; }
+
+/* Keyboard focus must not end up hidden behind the fixed bars (WCAG 2.4.11). */
+html { scroll-padding-top: 64px; scroll-padding-bottom: 88px; }
+@media (min-width: 768px) { html { scroll-padding-top: 8px; scroll-padding-bottom: 8px; } }

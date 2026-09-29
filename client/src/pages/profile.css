@@ -1,0 +1,57 @@
+.avatar { display: inline-block; flex: none; border-radius: 50%; object-fit: cover; background: var(--line); }
+.avatar-fallback { display: inline-grid; place-items: center; color: #F6F1EA; font-family: var(--font-display); font-weight: 600; }
+
+.btn-outline {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); height: 40px; padding: 0 var(--s4);
+  border: 1px solid var(--line); border-radius: 999px; font-weight: 600; background: var(--surface);
+}
+.btn-outline:hover { border-color: var(--muted); }
+.btn-outline:disabled { opacity: 0.6; }
+.link-btn { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.icon-btn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
+.icon-btn:hover { background: var(--line); }
+
+.profile-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4); padding: var(--s5) var(--s4) var(--s3); }
+.profile-id { flex: 1 1 160px; min-width: 0; }
+.profile-name { margin: 0; font: 600 28px/1.1 var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.profile-handle { margin: 2px 0 0; color: var(--muted); }
+.profile-bio { margin: 0; padding: 0 var(--s4); overflow-wrap: anywhere; white-space: pre-line; }
+.profile-counts { display: flex; gap: var(--s5); margin: var(--s4) 0 var(--s5); padding: 0 var(--s4); }
+.profile-counts a { min-height: 44px; align-items: center; }
+.profile-counts b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.profile-counts span { color: var(--muted); }
+
+.profile-tabs { display: flex; border-bottom: 1px solid var(--line); }
+.profile-tab { flex: 1; height: 48px; font-weight: 600; position: relative; }
+.profile-tab[aria-selected='true']::after { content: ''; position: absolute; left: 30%; right: 30%; bottom: -1px; height: 3px; border-radius: 3px; background: var(--accent); }
+.profile-empty { padding: var(--s6) var(--s4); color: var(--muted); text-align: center; }
+.profile-skel { height: 220px; margin: var(--s4); border-radius: var(--radius); background: var(--line); opacity: 0.5; }
+
+.edit-bar { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); border-bottom: 1px solid var(--line); }
+.edit-title { margin: 0; font: 600 20px/1 var(--font-display); }
+.edit-form { padding: var(--s5) var(--s4) var(--s7); }
+.edit-avatar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.field textarea {
+  width: 100%; padding: var(--s3); font: inherit; font-size: 16px; color: var(--ink); resize: vertical;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.field textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.field-hint { color: var(--muted); font-size: 13px; text-align: right; }
+
+@media (min-width: 768px) {
+  .profile-head { padding: var(--s6) var(--s5) var(--s3); }
+  .profile-bio, .profile-counts { padding: 0 var(--s5); }
+}
+
+.btn-follow, .btn-following { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 var(--s5); border-radius: 999px; font-weight: 600; }
+.btn-follow { background: var(--ink); color: var(--bg); }
+.btn-following { border: 1px solid var(--moss); color: var(--moss); background: transparent; }
+.btn-following:hover { border-color: var(--accent); color: var(--accent); }
+.profile-counts a { display: flex; gap: 6px; align-items: baseline; }
+.profile-counts a:hover span { color: var(--ink); text-decoration: underline; }
+.muted { color: var(--muted); font: 400 15px var(--font-ui); margin-left: 6px; }
+.user-row { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+.user-row-main { display: flex; align-items: center; gap: var(--s3); flex: 1; min-width: 0; }
+.user-row-text { display: flex; flex-direction: column; min-width: 0; }
+.user-row-text strong { overflow-wrap: anywhere; }
+.user-row-bio { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

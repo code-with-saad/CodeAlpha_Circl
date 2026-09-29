@@ -1,0 +1,28 @@
+@import '../components/post.css';
+@import './profile.css';
+
+.notes { list-style: none; margin: 0; padding: 0; }
+.note { position: relative; display: flex; align-items: flex-start; gap: var(--s3); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+.note:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.note.unread { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.note.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+.note-icon { flex: none; display: grid; place-items: center; width: 28px; height: 28px; margin-top: 4px; border-radius: 50%; }
+.tone-accent { color: var(--accent); }
+.tone-moss { color: var(--moss); }
+.tone-ink { color: var(--ink); }
+.note-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+.note-snippet { color: var(--muted); font-size: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.note-time { flex: none; color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+.seg { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.seg button { min-height: 40px; padding: 0 var(--s4); border-radius: 999px; font-weight: 500; color: var(--muted); }
+.seg button[aria-checked='true'] { background: var(--ink); color: var(--bg); font-weight: 600; }
+.set-section { padding: var(--s4); border-bottom: 1px solid var(--line); }
+.set-section h2 { margin: 0 0 var(--s3); font: 600 20px/1.2 var(--font-display); }
+.set-section p { margin: 0 0 var(--s3); color: var(--muted); }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
+.set-form { display: grid; gap: var(--s3); max-width: 420px; }
+.set-ok { color: var(--moss); margin: 0; font-weight: 600; }
+.danger-zone h2 { color: var(--accent); }
+.btn-danger-solid { height: 44px; padding: 0 var(--s5); border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn-danger-solid:disabled { opacity: 0.6; }

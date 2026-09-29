@@ -1,0 +1,45 @@
+.boot { min-height: 100dvh; display: grid; place-items: center; }
+.boot .wordmark-ring { width: 28px; height: 28px; border-width: 6px; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .boot .wordmark-ring { animation: none; } }
+
+.auth { min-height: 100dvh; display: grid; grid-template-columns: 1fr; }
+.auth-aside { display: none; }
+.auth-main { width: 100%; max-width: 440px; margin: 0 auto; padding: var(--s5) var(--s4) var(--s7); }
+.auth-title { margin: var(--s6) 0 var(--s2); font: 600 34px/1.05 var(--font-display); letter-spacing: -0.015em; }
+.auth-lede { margin: 0 0 var(--s5); color: var(--muted); }
+
+.auth-form { display: grid; gap: var(--s4); }
+.field { display: grid; gap: 6px; }
+.field-label { font-size: 14px; font-weight: 600; }
+.field input {
+  width: 100%; height: 48px; padding: 0 var(--s3); font: inherit; font-size: 16px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.field input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.field-error, .form-error { color: var(--accent); font-size: 14px; }
+.form-error { margin: 0; padding: var(--s3); border: 1px solid var(--accent); border-radius: 10px; }
+.pw { position: relative; display: block; }
+.pw input { padding-right: 52px; }
+.pw-toggle { position: absolute; right: 2px; top: 2px; width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); border-radius: 8px; }
+
+.btn-primary {
+  height: 48px; margin-top: var(--s2); border-radius: 999px; background: var(--accent); color: var(--accent-ink);
+  font-weight: 600; font-size: 16px;
+}
+.btn-primary:disabled { opacity: 0.6; cursor: progress; }
+.auth-alt { margin: var(--s5) 0 0; color: var(--muted); }
+.auth-alt a { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+/* 768+: split layout, decorative circles + one line of voice on the left */
+@media (min-width: 768px) {
+  .auth { grid-template-columns: minmax(280px, 5fr) 6fr; }
+  .auth-aside {
+    display: block; position: relative; overflow: hidden; background: #2F5D50; color: #F6F1EA;
+  }
+  .auth-ring { position: absolute; border-radius: 50%; border: 36px solid rgba(246, 241, 234, 0.16); }
+  .auth-ring-a { width: 420px; height: 420px; left: -140px; top: -120px; }
+  .auth-ring-b { width: 300px; height: 300px; right: -90px; bottom: 200px; border-color: rgba(240, 123, 85, 0.5); }
+  .auth-quote { z-index: 1; text-wrap: balance; position: absolute; left: var(--s6); right: var(--s6); bottom: var(--s7); margin: 0; font: 500 clamp(28px, 3vw, 40px)/1.1 var(--font-display); }
+  .auth-main { align-self: center; padding: var(--s7) var(--s6); }
+}
