@@ -11,10 +11,13 @@ import mongoose from 'mongoose';
 import User from '../src/models/User.js';
 import Post from '../src/models/Post.js';
 import Comment from '../src/models/Comment.js';
+import Report from '../src/models/Report.js';
+import AdminLog from '../src/models/AdminLog.js';
 import { extractTags } from '../src/utils/tags.js';
 
 const SEED_PASSWORD = process.env.SEED_PASSWORD || 'circl-demo-1234';
 const HOUR = 3600 * 1000;
+const DAY = 24 * HOUR;
 
 // Deterministic randomness so every run produces the same community.
 let s = 20260929;
@@ -86,6 +89,46 @@ const POSTS = [
   [13, 'Sunrise swim, empty lake, one very confused heron. #swimming', 3],
 ];
 
+// Older, quieter posts that give the dashboard history to chart. Authors are assigned by join date.
+const OLDER = [
+  ['Slow morning, good coffee, nothing on the calendar.'],
+  ['New here. Looking forward to seeing what everyone is making.'],
+  ['Small win today: finished the thing I kept putting off.'],
+  ['Rain all afternoon, which means an excuse to stay in and tinker. #ceramics'],
+  ['Does anyone else keep a running list of books they will never actually read? #books'],
+  ['Long ride with a headwind the whole way. Character building. #cycling'],
+  ['Tried a new recipe and only mildly burned it. Progress. #cooking'],
+  ['The light through the window at 5pm has been unreal this week. #filmphotography'],
+  ['Repotted three plants and knocked one over. Even score. #houseplants'],
+  ['Notes to self: drink water, go outside, call your mother.'],
+  ['Found an old sketchbook from years ago. Cringe and pride in equal measure. #sketchbook'],
+  ['Early swim, empty pool, the good kind of tired. #swimming'],
+  ['Made a beat from a dripping tap. Not my proudest work, but it is mine. #music'],
+  ['Someone at the market gave me a free tomato and it changed my week.'],
+  ['Trying to write down one good thing each day. Day nine, still going.'],
+  ['Hot take: the second half of a book is always better than the first. #reading'],
+  ['Trail was closed so we made our own loop. No regrets. #hiking'],
+  ['Sunday bread came out flat but tasted right. #sourdough'],
+  ['Thrifted a jacket that fits like it was made for me. #thrifting'],
+  ['Debugged for two hours. The fix was one character. #coding'],
+  ['New rule: phone stays in the other room after 9pm. Day three.'],
+  ['Autumn is officially here and I am officially unprepared.'],
+  ['Practising patience with a very stubborn glaze. #glaze #ceramics'],
+  ['Mended a hole in my favourite sweater. Bright thread on purpose. #slowfashion'],
+  ['Marathon plan says rest day. Body agrees, brain does not. #running'],
+  ['Made tea, forgot tea, found cold tea. Classic. '],
+  ['Looking for book recommendations that are short and sad. #books'],
+  ['Cold water this morning was a personal attack. Loved it. #coldwater'],
+  ['Three things I learned this week and none of them are useful.'],
+  ['Reminder that you do not have to reply to everything today.'],
+  ['Just finished a roll of film. Terrified and excited to see it. #filmphotography'],
+  ['The market had the first squash of the season. I bought four. #cooking'],
+  ['Wrote a tiny script that renames my downloads. It changed my life a little. #coding'],
+  ['Watched the fog burn off the hills from the summit. Worth the alarm. #hiking'],
+  ['Working on something new. Not ready to share, but soon.'],
+  ['Thank you to everyone who stopped by the stall. Sold out of mugs by noon. #ceramics'],
+];
+
 const COMMENTS = [
   'This is so good.', 'Saving this one.', 'Okay you have convinced me.', 'Needed this today.',
   'Love the light in this.', 'Tell me more!', 'Same, weirdly relatable.', 'That last line, yes.',
@@ -149,6 +192,8 @@ async function main() {
   await Promise.all([
     Comment.deleteMany({ $or: [{ author: { $in: oldIds } }, { post: { $in: oldPostIds } }] }),
     Post.deleteMany({ author: { $in: oldIds } }),
+    Report.deleteMany({ $or: [{ reporter: { $in: oldIds } }, { user: { $in: oldIds } }, { post: { $in: oldPostIds } }] }),
+    AdminLog.deleteMany({ admin: { $in: oldIds } }),
     User.updateMany({}, { $pull: { following: { $in: oldIds }, followers: { $in: oldIds }, saved: { $in: oldPostIds } } }),
   ]);
   await User.deleteMany({ isSeed: true });
@@ -161,18 +206,25 @@ async function main() {
 
   // ---- users ----
   const hash = await bcrypt.hash(SEED_PASSWORD, 12);
+  // People joined over the last two months, so signup trends and period comparisons have something to show.
+  const JOINED_DAYS_AGO = [58, 55, 51, 47, 42, 38, 34, 29, 24, 19, 14, 9, 5, 2];
+  const t0 = Date.now();
+  const joined = (i) => new Date(t0 - JOINED_DAYS_AGO[i] * DAY);
   const users = await User.insertMany(
-    PEOPLE.map(([username, displayName, bio]) => ({
+    PEOPLE.map(([username, displayName, bio], i) => ({
       username, displayName, bio, email: `${username}@circl.local`, password: hash, isSeed: true,
-    }))
+      createdAt: joined(i), updatedAt: joined(i),
+    })),
+    { timestamps: false }
   );
 
   const adminPassword = process.env.ADMIN_PASSWORD || crypto.randomBytes(9).toString('base64url');
   await User.deleteOne({ username: 'circl_admin' });
-  await User.create({
+  const admin = await User.create({
     username: 'circl_admin', displayName: 'Circl Admin', bio: 'Keeping the circle tidy.',
     email: 'admin@circl.local', password: await bcrypt.hash(adminPassword, 12), role: 'admin', isSeed: true,
   });
+  await User.updateOne({ _id: admin._id }, { createdAt: new Date(t0 - 62 * DAY) }, { timestamps: false });
 
   // ---- follows: everyone follows a handful of others ----
   const follows = users.map(() => new Set());
@@ -201,6 +253,23 @@ async function main() {
   }));
   base.forEach((p) => { p.updatedAt = p.createdAt; });
   const posts = await Post.insertMany(base, { timestamps: false });
+
+  // ---- older posts, weighted toward recent weeks, written only by people who had already joined ----
+  const older = OLDER.map(([text], k) => {
+    const daysAgo = 3 + Math.floor(56 * rand() ** 1.7);
+    const eligible = users.map((u, i) => i).filter((i) => JOINED_DAYS_AGO[i] >= daysAgo);
+    const author = users[pick(eligible.length ? eligible : [0])];
+    const createdAt = new Date(now - daysAgo * DAY - Math.floor(rand() * 20) * HOUR);
+    return { author: author._id, text, tags: extractTags(text), createdAt, updatedAt: createdAt, likes: sample(users, Math.floor(rand() * 7)).filter((u) => String(u._id) !== String(author._id)).map((u) => u._id), _k: k };
+  });
+  const madeOlder = await Post.insertMany(older, { timestamps: false });
+  const olderComments = madeOlder.flatMap((p) => Array.from({ length: Math.floor(rand() * 3) }, () => ({
+    post: p._id, author: pick(users)._id, text: pick(COMMENTS), createdAt: new Date(p.createdAt.getTime() + (0.5 + rand() * 20) * HOUR),
+  })));
+  await Comment.insertMany(olderComments.map((c) => ({ ...c, updatedAt: c.createdAt })), { timestamps: false });
+  const olderCounts = new Map();
+  olderComments.forEach((c) => olderCounts.set(String(c.post), (olderCounts.get(String(c.post)) || 0) + 1));
+  for (const [id, n] of olderCounts) await Post.updateOne({ _id: id }, { commentsCount: n }, { timestamps: false });
 
   // ---- reshares and quotes ----
   const reposts = [];
@@ -239,7 +308,34 @@ async function main() {
   for (const [id, n] of perPost) await Post.updateOne({ _id: id }, { commentsCount: n });
   for (const u of users) await User.updateOne({ _id: u._id }, { saved: sample(posts, Math.floor(rand() * 5)).map((p) => p._id) });
 
-  console.log(`Seeded ${users.length} users, ${all.length} posts (${madeReposts.length} reshares), ${madeComments.length} comments.`);
+  // ---- a small moderation queue and audit trail so the admin dashboard has something to show ----
+  const flagged = sample(posts.filter((p) => !p.repostOf), 5)
+  const reportSpecs = [
+    ['spam', 'Looks like promotion, not part of the conversation.', 'open'],
+    ['misinformation', '', 'open'],
+    ['inappropriate', 'Not something I want on my feed.', 'open'],
+    ['harassment', '', 'dismissed'],
+    ['other', 'Not sure, please check.', 'dismissed'],
+  ]
+  const reports = flagged.map((p, i) => {
+    const reporter = users.find((u) => String(u._id) !== String(p.author) && u.username !== 'maya_makes') || users[0]
+    const [reason, details, status] = reportSpecs[i]
+    return {
+      reporter: reporter._id, targetType: 'post', post: p._id, reason, details, status,
+      ...(status === 'open' ? {} : { resolvedBy: admin._id, resolvedAt: new Date(now - 3 * HOUR), resolution: 'No violation found' }),
+      createdAt: new Date(now - (2 + i * 5) * HOUR),
+    }
+  })
+  const target = users[4]
+  reports.push({ reporter: users[9]._id, targetType: 'user', user: target._id, reason: 'spam', details: 'Keeps replying with links.', status: 'open', createdAt: new Date(now - HOUR) })
+  await Report.insertMany(reports.map((r) => ({ ...r, updatedAt: r.createdAt })), { timestamps: false });
+  await AdminLog.insertMany([
+    { admin: admin._id, action: 'Dismissed report', target: 'post report (harassment)', createdAt: new Date(now - 3 * HOUR) },
+    { admin: admin._id, action: 'Dismissed report', target: 'post report (other)', createdAt: new Date(now - 6 * HOUR) },
+    { admin: admin._id, action: 'Restored', target: '@sam_swims', createdAt: new Date(now - 20 * HOUR) },
+  ], { timestamps: false });
+
+  console.log(`Seeded ${users.length} users, ${all.length + madeOlder.length} posts (${madeReposts.length} reshares), ${madeComments.length + olderComments.length} comments.`);
   console.log(`\nDemo login:  maya_makes@circl.local  /  ${SEED_PASSWORD}   (all seed users share this password)`);
   console.log(`Admin login: admin@circl.local  /  ${adminPassword}${process.env.ADMIN_PASSWORD ? '' : '   (random, shown once; set ADMIN_PASSWORD to choose)'}`);
   await mongoose.disconnect();
