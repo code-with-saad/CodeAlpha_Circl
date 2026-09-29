@@ -1,6 +1,7 @@
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
 import Post from '../models/Post.js';
+import Report from '../models/Report.js';
 import User from '../models/User.js';
 import { removePostCascade } from '../controllers/postController.js';
 
@@ -20,6 +21,8 @@ export async function purgeUser(user) {
   await Promise.all([
     Comment.deleteMany({ author: user._id }),
     Notification.deleteMany({ $or: [{ actor: user._id }, { recipient: user._id }] }),
+    Report.deleteMany({ reporter: user._id }),
+    Report.updateMany({ user: user._id, status: 'open' }, { status: 'actioned', resolution: 'Account deleted', resolvedAt: new Date() }),
     User.updateMany({ following: user._id }, { $pull: { following: user._id } }),
     User.updateMany({ followers: user._id }, { $pull: { followers: user._id } }),
     Post.updateMany({ likes: user._id }, { $pull: { likes: user._id } }),

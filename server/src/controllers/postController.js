@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import { isOwnImage } from '../utils/cloudinary.js';
 import { extractTags, TAG_NAME_RE } from '../utils/tags.js';
 import Notification from '../models/Notification.js';
+import Report from '../models/Report.js';
 import { notify, unnotify } from '../utils/notify.js';
 import { AUTHOR_FIELDS, POST_POPULATE, commentJSON, postJSON } from '../utils/serialize.js';
 
@@ -84,6 +85,7 @@ export async function removePostCascade(post) {
     Post.deleteMany({ _id: { $in: ids } }),
     Comment.deleteMany({ post: { $in: ids } }),
     Notification.deleteMany({ post: { $in: ids } }),
+    Report.updateMany({ post: { $in: ids }, status: 'open' }, { status: 'actioned', resolution: 'Post removed', resolvedAt: new Date() }),
     User.updateMany({ saved: { $in: ids } }, { $pull: { saved: { $in: ids } } }),
     // If this post was itself a reshare, the original's counter goes down.
     post.repostOf ? Post.updateOne({ _id: post.repostOf, repostsCount: { $gt: 0 } }, { $inc: { repostsCount: -1 } }) : null,

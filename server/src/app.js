@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import uploadRoutes from './routes/uploads.js';
 import notificationRoutes from './routes/notifications.js';
+import reportRoutes from './routes/reports.js';
 import adminRoutes from './routes/admin.js';
 import postRoutes, { commentRouter } from './routes/posts.js';
 
@@ -50,6 +51,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRouter);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.use((_req, res) => res.status(404).json({ message: 'Not found' }));
