@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { BookmarkSimple, ChatCircle, Heart, Repeat, ShareNetwork, Trash } from '@phosphor-icons/react'
+import { BookmarkSimple, ChatCircle, Heart, Repeat, Flag, ShareNetwork, Trash } from '@phosphor-icons/react'
 import Avatar from './Avatar'
 import PostText from './PostText'
+import ReportDialog from './ReportDialog'
 import { api, errorMessage } from '../lib/api'
 import { fit } from '../lib/cloudinary'
 import { confirm, toast } from '../lib/feedback'
@@ -17,6 +18,7 @@ export default function PostCard({ post, detail = false, onRemoved }) {
   const [menu, setMenu] = useState(false)
   const [quoting, setQuoting] = useState(false)
   const [quote, setQuote] = useState('')
+  const [reporting, setReporting] = useState(false)
   const menuRef = useRef(null)
   // Optimistic copy of the fields the buttons change; reverted if the request fails.
   const [live, setLive] = useState({
@@ -154,10 +156,14 @@ export default function PostCard({ post, detail = false, onRemoved }) {
             <BookmarkSimple size={22} weight={live.saved ? 'fill' : 'regular'} />
           </button>
           <button className="post-action" onClick={share} aria-label="Share post"><ShareNetwork size={22} /></button>
-          {mine && (
+          {mine ? (
             <button className="post-action post-delete" onClick={remove} aria-label="Delete post"><Trash size={22} /></button>
+          ) : (
+            <button className="post-action post-delete" onClick={() => setReporting(true)} aria-label="Report post"><Flag size={22} /></button>
           )}
         </footer>
+
+        {reporting && <ReportDialog type="post" id={post.id} label="this post" onClose={() => setReporting(false)} />}
 
         {quoting && (
           <form className="quote-form" onSubmit={(e) => { e.preventDefault(); if (quote.trim()) reshare(quote.trim()) }}>

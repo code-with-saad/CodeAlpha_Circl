@@ -29,3 +29,11 @@ dialog.confirm::backdrop { background: rgba(26, 23, 20, 0.55); }
 .confirm-message { margin: 0 0 var(--s5); color: var(--muted); overflow-wrap: anywhere; }
 .confirm-actions { display: flex; justify-content: flex-end; gap: var(--s3); }
 .confirm-actions .btn-outline, .confirm-actions .btn-danger-solid, .confirm-actions .confirm-go { height: 44px; padding: 0 var(--s5); margin: 0; }
+
+dialog.report { width: min(94vw, 440px); }
+.report-reasons { border: 0; margin: 0 0 var(--s4); padding: 0; display: grid; gap: 2px; }
+.report-reasons legend { padding: 0; margin-bottom: var(--s2); }
+.report-reason { display: flex; align-items: center; gap: var(--s3); min-height: 44px; padding: 0 var(--s2); border-radius: 10px; cursor: pointer; }
+.report-reason:hover { background: var(--line); }
+.report-reason input { width: 20px; height: 20px; accent-color: var(--accent); }
+dialog.report textarea { width: 100%; padding: var(--s3); font: inherit; font-size: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; resize: vertical; }

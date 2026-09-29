@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import { Flag } from '@phosphor-icons/react'
 import FollowButton from '../components/FollowButton'
+import ReportDialog from '../components/ReportDialog'
 import Avatar from '../components/Avatar'
 import PostCard from '../components/PostCard'
 import { usePagedPosts } from '../lib/usePagedPosts'
@@ -23,6 +25,7 @@ export default function ProfilePage() {
 function Profile({ username }) {
   const me = useSelector((s) => s.auth.user)
   const [state, setState] = useState({ status: 'loading', user: null })
+  const [reporting, setReporting] = useState(false)
   const posts = usePagedPosts(`/users/${username}/posts`)
 
   useEffect(() => {
@@ -59,8 +62,17 @@ function Profile({ username }) {
         </div>
         {user.isMe
           ? <Link to="/edit-profile" className="btn-outline">Edit profile</Link>
-          : <FollowButton username={user.username} isFollowing={user.isFollowing} onChange={onFollowChange} />}
+          : (
+            <>
+              <FollowButton username={user.username} isFollowing={user.isFollowing} onChange={onFollowChange} />
+              {user.role !== 'admin' && (
+                <button className="icon-btn" onClick={() => setReporting(true)} aria-label={`Report @${user.username}`}><Flag size={22} /></button>
+              )}
+            </>
+          )}
       </header>
+
+      {reporting && <ReportDialog type="user" id={user.id} label={`@${user.username}`} onClose={() => setReporting(false)} />}
 
       {user.bio && <p className="profile-bio">{user.bio}</p>}
 
