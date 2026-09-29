@@ -149,5 +149,4 @@ npm run make-admin -- you@example.com
 
 ---
 
-Part of a 3-project internship submission for CodeAlpha.
-1. [Nexoria](https://github.com/code-with-saad/CodeAlpha_Nexoria) 2. [Circl](https://codealpha-circl.vercel.app/)
+Part of a 3-project internship submission for CodeAlpha. See also [Nexoria](https://github.com/code-with-saad/CodeAlpha_Nexoria) · [Circl](https://codealpha-circl.vercel.app/)
